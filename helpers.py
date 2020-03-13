@@ -63,8 +63,7 @@ def generate_moves(piece, pieces, coords):
             update_movelist(moves, x-1, y-1, x-1>=0, y-1>=0)
             update_movelist(moves, x+1, y-1, x+1<8, y-1>=0)
 
-            moves = list(filter(lambda x: x != [], moves))
-            moves = list(dict.fromkeys(moves))
+
             moves = process_moves(piece, pieces, moves)
 
             piece.hasBeenClickedCount += 1
@@ -79,8 +78,6 @@ def generate_moves(piece, pieces, coords):
             update_movelist(moves, x-1, y+1, x-1>=0, y+1<8)
             update_movelist(moves, x+1, y+1, x+1<8, y+1<8)
 
-            moves = list(filter(lambda x: x != [], moves))
-            moves = list(dict.fromkeys(moves))
             moves = process_moves(piece, pieces, moves)
 
             piece.hasBeenClickedCount += 1
@@ -92,12 +89,10 @@ def generate_moves(piece, pieces, coords):
         update_movelist(moves, x-1, y+2, x-1>=0, y+2<8)
         update_movelist(moves, x-1, y-2, x-1>=0, y-2>=0)
         update_movelist(moves, x+2, y+1, x+2<8, y+1<8)
-        update_movelist(moves, x+2, y-1, x+2<8, y-1<8)
+        update_movelist(moves, x+2, y-1, x+2<8, y-1>=0)
         update_movelist(moves, x-2, y+1, x-2>=0, y+1<8)
         update_movelist(moves, x-2, y-1, x-2>=0, y-1>=0)
 
-        moves = list(filter(lambda x: x != [], moves))
-        moves = list(dict.fromkeys(moves))
         moves = process_moves(piece, pieces, moves)
 
         piece.hasBeenClickedCount += 1
@@ -110,8 +105,6 @@ def generate_moves(piece, pieces, coords):
             update_movelist(moves, x+c, y-c, x+c<8, y-c>=0)
             update_movelist(moves, x-c, y+c, x-c>=0, y+c<8)
 
-        moves = list(filter(lambda x: x != [], moves))
-        moves = list(dict.fromkeys(moves))
         moves = process_moves(piece, pieces, moves)
 
         piece.hasBeenClickedCount += 1
@@ -124,8 +117,6 @@ def generate_moves(piece, pieces, coords):
             update_movelist(moves, x+c, y, x+c<8, True)
             update_movelist(moves, x-c, y, x-c>=0, True)
 
-        moves = list(filter(lambda x: x != [], moves))
-        moves = list(dict.fromkeys(moves))
         moves = process_moves(piece, pieces, moves)
 
         piece.hasBeenClickedCount += 1
@@ -143,8 +134,6 @@ def generate_moves(piece, pieces, coords):
             update_movelist(moves, x, y-c, True, y-c>=0)
             update_movelist(moves, x-c, y-c, x-c>=0, y-c>=0)
 
-        moves = list(filter(lambda x: x != [], moves))
-        moves = list(dict.fromkeys(moves))
         moves = process_moves(piece, pieces, moves)
 
         piece.hasBeenClickedCount += 1
@@ -168,8 +157,6 @@ def generate_moves(piece, pieces, coords):
             update_movelist(moves, x+2, y, piece.hasBeenClickedCount == 0, y==0)
             update_movelist(moves, x-3, y, piece.hasBeenClickedCount == 0, y==0)
 
-        moves = list(filter(lambda x: x != [], moves))
-        moves = list(dict.fromkeys(moves))
         moves = process_moves(piece, pieces, moves)
 
         piece.hasBeenClickedCount += 1
@@ -181,6 +168,11 @@ def update_movelist(list, a, b, acondition=True, bcondition=True):
         list.append((a,b))
 
 def process_moves(piece, pieces, moves):
+
+    #Remove empty lists of moves and duplicates
+    moves = list(filter(lambda x: x != [], moves))
+    moves = list(dict.fromkeys(moves))
+
     x, y = return_indices(piece.rect.center, coords)
     for other in pieces:
         i, j = return_indices(other.rect.center, coords)
@@ -248,10 +240,10 @@ def return_closest_indices(ref, coords):
         if numpy.linalg.norm(ref - coords[i,j]) < delta:
             return i, j
 
-def get_pieces(type, pieces):
+def get_pieces(kind, pieces):
     mylist =[]
     for piece in pieces:
-        if type == 'R':
+        if piece.type == kind:
             mylist.append(piece)
 
     return mylist
