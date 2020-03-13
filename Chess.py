@@ -314,13 +314,6 @@ def make_move(piece, pieces, curr_pos, moves, screen):
         if piece.type == 'KG':
             piece.check = False
 
-
-# Build winning condition
-def hasWon(king):
-    if len(king.moves) == 0:
-        return True
-    return False
-
 #Find intersecting moves of two pieces
 def common_moves(piece1, piece2):
     moves = [value for value in piece1.moves if value in piece2.moves]
