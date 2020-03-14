@@ -152,9 +152,11 @@ def putInCheck(piece, king):
     x, y = return_indices(king.rect.center, coords)
     for move in piece.moves:
         if x == move[0] and y == move[1]:
-            return piece, True
+            king.check = True
+        else:
+            king.check = False
 
-    return piece, False
+    return king.check
 
 def make_move(piece, pieces, curr_pos, moves, screen):
     """Takes a piece and makes the appropriate action
@@ -357,9 +359,10 @@ def main():
                 clicked = [piece for piece in pieces if piece.clicked]
 
                 king = list(filter(lambda x: x.type == 'KG' and x.colour == turn_colour, pieces))[0]
-
+                king.moves = generate_moves(king, pieces, coords, turn_colour)
+                print(king.moves)
                 if king.check:
-                   if event.button == 1 and king.rect.collidepoint(mouse_pos):
+                    if event.button == 1 and king.rect.collidepoint(mouse_pos):
                        king.clicked = True
                        clicked_piece = king
                        position = numpy.array(king.rect.center)
@@ -370,7 +373,7 @@ def main():
                                 piece.clicked = True
                                 clicked_piece = piece
                                 position = numpy.array(piece.rect.center)
-                                clicked_piece.moves = generate_moves(piece, pieces, coords)
+                                clicked_piece.moves = generate_moves(piece, pieces, coords, turn_colour)
                                 break
 
             if event.type == pygame.MOUSEBUTTONUP:
@@ -385,11 +388,11 @@ def main():
                     if clicked_piece == king and king.check:
                         continue
                     #Update moveset if the clicked_piece is not in check
-                    clicked_piece.moves = generate_moves(clicked_piece, pieces, coords)
+                    clicked_piece.moves = generate_moves(clicked_piece, pieces, coords, turn_colour)
                     clicked_piece.hasBeenClickedCount -= 1 #since we increase moves by 1 in the above step - too many!
 
                     enemy_king = list(filter(lambda x: x.type == 'KG' and x.colour != clicked_piece.colour, pieces))[0]
-                    enemy_king.moves = generate_moves(enemy_king, pieces, coords)
+                    enemy_king.moves = generate_moves(enemy_king, pieces, coords, turn_colour)
                     enemies = list(filter(lambda x: x.colour != enemy_king.colour, pieces))
                     enemies_moves = [enemy.moves for enemy in enemies]
 
@@ -399,17 +402,14 @@ def main():
 
                         #Kings cannot check other kings (by design!), so we check if the piece is not a king first
                         if clicked_piece != 'KG':
-                            check_piece, inCheck = putInCheck(clicked_piece, enemy_king)
-                            if inCheck:
+                            enemy_king.check = putInCheck(clicked_piece, enemy_king)
+                            if enemy_king.check:
                                 #It will then be opposite turns go, and so enemy_king will be only one you can move
-                                enemy_king.check = True
                                 if len(enemy_king.moves) == 0:
                                     #Checkmate!
                                     print(turn_colour + " wins!")
                                     os.sys.exit()
                                 print("Check!")
-                            else:
-                                enemy_king.check = False
 
                         for move in invalid_moves:
                             enemy_king.moves.remove(move)
@@ -423,7 +423,6 @@ def main():
         screen.blit(board, board_canvas)
         pieces.draw(screen)
         pygame.display.flip()
-
 
 if __name__ == '__main__':
     main()
