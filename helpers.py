@@ -7,20 +7,20 @@ import numpy
 
 screen_width=800
 screen_height=800
-BLACK = 0,0,0 
+Black = 0,0,0 
 RED = 255,0,0
 GREEN = 0,255,0
 BLUE = 0,0,255
-WHITE = 255,255,255
+White = 255,255,255
 delta = 60 #if placing piece within delta pixels of a square, place in that square
 
 types = ['P', 'B', 'K', 'R', 'Q', 'KG']
-white_pieces = {}
-black_pieces = {}
+White_pieces = {}
+Black_pieces = {}
 
 for p in types:
-    white_pieces[p] = os.getcwd() +  '/images/' + p + 'w.png'
-    black_pieces[p] = os.getcwd() + '/images/' + p + 'b.png'
+    White_pieces[p] = os.getcwd() +  '/images/' + p + 'w.png'
+    Black_pieces[p] = os.getcwd() + '/images/' + p + 'b.png'
 
 #Pre-determined ratios between square screen dimensions and the top left of the board image
 start_fract = 3 / 40
@@ -45,79 +45,78 @@ board_area = pygame.Rect((0.5*start_y, 0.5*start_x), (start_y+7*incr_y, start_x+
 coords = numpy.array([[[x,y] for y in range(start_x,start_x+8*incr_x,incr_x)] for x in range(start_y,start_y+8*incr_y,incr_y)])
 ###############################################################################################################################
 
-def generate_moves(piece, pieces, coords):
+def generate_moves(piece, pieces, coords, turn_colour):
     #Pawns: can move up by at most 2 at starts, then by 1
-    moves = []
     x, y = return_indices(piece.rect.center, coords)
-
+    piece.moves = []
     #Pawns
     if piece.type == 'P':
-        if piece.colour == 'white':
+        if piece.colour == 'White':
             #if at start of game, pawn can move up twice
             if piece.hasBeenClickedCount == 0:
-                moves.append((x, y-2))
+                piece.moves.append((x, y-2))
 
-            update_movelist(moves, x, y-1, x>=0 and x<8, y-1>=0)
+            update_movelist(piece.moves, x, y-1, x>=0 and x<8, y-1>=0)
 
             #Append take moves
-            update_movelist(moves, x-1, y-1, x-1>=0, y-1>=0)
-            update_movelist(moves, x+1, y-1, x+1<8, y-1>=0)
+            update_movelist(piece.moves, x-1, y-1, x-1>=0, y-1>=0)
+            update_movelist(piece.moves, x+1, y-1, x+1<8, y-1>=0)
 
 
-            moves = process_moves(piece, pieces, moves)
+            process_moves(piece, pieces, turn_colour)
 
             piece.hasBeenClickedCount += 1
 
-        elif piece.colour == 'black':
+        elif piece.colour == 'Black':
             if piece.hasBeenClickedCount == 0:
-                moves.append((x, y+2))
+                piece.moves.append((x, y+2))
 
-            update_movelist(moves, x, y+1, True, y+1<8)
+            update_movelist(piece.moves, x, y+1, True, y+1<8)
 
             #Append take moves
-            update_movelist(moves, x-1, y+1, x-1>=0, y+1<8)
-            update_movelist(moves, x+1, y+1, x+1<8, y+1<8)
+            update_movelist(piece.moves, x-1, y+1, x-1>=0, y+1<8)
+            update_movelist(piece.moves, x+1, y+1, x+1<8, y+1<8)
 
-            moves = process_moves(piece, pieces, moves)
+            process_moves(piece, pieces, turn_colour)
 
             piece.hasBeenClickedCount += 1
             
     #Knights
     elif piece.type == 'K':
-        update_movelist(moves, x+1, y+2, x+1<8, y+2<8)
-        update_movelist(moves, x+1, y-2, x+1<8, y-2>=0)
-        update_movelist(moves, x-1, y+2, x-1>=0, y+2<8)
-        update_movelist(moves, x-1, y-2, x-1>=0, y-2>=0)
-        update_movelist(moves, x+2, y+1, x+2<8, y+1<8)
-        update_movelist(moves, x+2, y-1, x+2<8, y-1>=0)
-        update_movelist(moves, x-2, y+1, x-2>=0, y+1<8)
-        update_movelist(moves, x-2, y-1, x-2>=0, y-1>=0)
+        update_movelist(piece.moves, x+1, y+2, x+1<8, y+2<8)
+        update_movelist(piece.moves, x+1, y-2, x+1<8, y-2>=0)
+        update_movelist(piece.moves, x-1, y+2, x-1>=0, y+2<8)
+        update_movelist(piece.moves, x-1, y-2, x-1>=0, y-2>=0)
+        update_movelist(piece.moves, x+2, y+1, x+2<8, y+1<8)
+        update_movelist(piece.moves, x+2, y-1, x+2<8, y-1>=0)
+        update_movelist(piece.moves, x-2, y+1, x-2>=0, y+1<8)
+        update_movelist(piece.moves, x-2, y-1, x-2>=0, y-1>=0)
 
-        moves = process_moves(piece, pieces, moves)
+        process_moves(piece, pieces, turn_colour)
 
         piece.hasBeenClickedCount += 1
 
     #Bishops
     elif piece.type == 'B':
         for c in range(1,8):
-            update_movelist(moves, x+c, y+c, x+c<8, y+c<8)
-            update_movelist(moves, x-c, y-c, x-c>=0, y-c>=0)
-            update_movelist(moves, x+c, y-c, x+c<8, y-c>=0)
-            update_movelist(moves, x-c, y+c, x-c>=0, y+c<8)
+            update_movelist(piece.moves, x+c, y+c, x+c<8, y+c<8)
+            update_movelist(piece.moves, x-c, y-c, x-c>=0, y-c>=0)
+            update_movelist(piece.moves, x+c, y-c, x+c<8, y-c>=0)
+            update_movelist(piece.moves, x-c, y+c, x-c>=0, y+c<8)
 
-        moves = process_moves(piece, pieces, moves)
+        process_moves(piece, pieces, turn_colour)
 
         piece.hasBeenClickedCount += 1
 
     #Rooks
     elif piece.type == 'R':
         for c in range(1,8):
-            update_movelist(moves, x, y+c, True, y+c<8)
-            update_movelist(moves, x, y-c, True, y-c>=0)
-            update_movelist(moves, x+c, y, x+c<8, True)
-            update_movelist(moves, x-c, y, x-c>=0, True)
+            update_movelist(piece.moves, x, y+c, True, y+c<8)
+            update_movelist(piece.moves, x, y-c, True, y-c>=0)
+            update_movelist(piece.moves, x+c, y, x+c<8, True)
+            update_movelist(piece.moves, x-c, y, x-c>=0, True)
 
-        moves = process_moves(piece, pieces, moves)
+        process_moves(piece, pieces, turn_colour)
 
         piece.hasBeenClickedCount += 1
 
@@ -125,108 +124,113 @@ def generate_moves(piece, pieces, coords):
     elif piece.type == 'Q':
         #moves = list(combinations([x+c, x, x-c, y+c, y, y-c] for c in range(1,8)))
         for c in range(1,8):
-            update_movelist(moves, x+c, y+c, x+c<8, y+c<8)
-            update_movelist(moves, x, y+c, True, y+c<8)
-            update_movelist(moves, x-c, y+c, x-c>=0, y+c<8)
-            update_movelist(moves, x+c, y, x+c<8, True)
-            update_movelist(moves, x-c, y, x-c>=0, True)
-            update_movelist(moves, x+c, y-c, x+c<8, y-c>=0)
-            update_movelist(moves, x, y-c, True, y-c>=0)
-            update_movelist(moves, x-c, y-c, x-c>=0, y-c>=0)
+            update_movelist(piece.moves, x+c, y+c, x+c<8, y+c<8)
+            update_movelist(piece.moves, x, y+c, True, y+c<8)
+            update_movelist(piece.moves, x-c, y+c, x-c>=0, y+c<8)
+            update_movelist(piece.moves, x+c, y, x+c<8, True)
+            update_movelist(piece.moves, x-c, y, x-c>=0, True)
+            update_movelist(piece.moves, x+c, y-c, x+c<8, y-c>=0)
+            update_movelist(piece.moves, x, y-c, True, y-c>=0)
+            update_movelist(piece.moves, x-c, y-c, x-c>=0, y-c>=0)
 
-        moves = process_moves(piece, pieces, moves)
+        process_moves(piece, pieces, turn_colour)
 
         piece.hasBeenClickedCount += 1
 
     #Kings
     elif piece.type == 'KG':
-        update_movelist(moves, x+1, y+1, x+1<8, y+1<8)
-        update_movelist(moves, x, y+1, True, y+1<8)
-        update_movelist(moves, x-1, y+1, x-1>=0, y+1<8)
-        update_movelist(moves, x+1, y, x+1<8, True)
-        update_movelist(moves, x-1, y, x-1>=0, True)
-        update_movelist(moves, x+1, y-1, x+1<8, y-1>=0)
-        update_movelist(moves, x, y-1, True, y-1>=0)
-        update_movelist(moves, x-1, y-1, x-1>=0, y-1>=0)
+        update_movelist(piece.moves, x+1, y+1, x+1<8, y+1<8)
+        update_movelist(piece.moves, x, y+1, True, y+1<8)
+        update_movelist(piece.moves, x-1, y+1, x-1>=0, y+1<8)
+        update_movelist(piece.moves, x+1, y, x+1<8, True)
+        update_movelist(piece.moves, x-1, y, x-1>=0, True)
+        update_movelist(piece.moves, x+1, y-1, x+1<8, y-1>=0)
+        update_movelist(piece.moves, x, y-1, True, y-1>=0)
+        update_movelist(piece.moves, x-1, y-1, x-1>=0, y-1>=0)
 
         #Castling
-        if piece.colour == 'white' and piece.hasBeenClickedCount == 0:
-            update_movelist(moves, x+2, y, piece.hasBeenClickedCount == 0, y==7)
-            update_movelist(moves, x-3, y, piece.hasBeenClickedCount == 0, y==7)
-        elif piece.colour == 'black' and piece.hasBeenClickedCount == 0:
-            update_movelist(moves, x+2, y, piece.hasBeenClickedCount == 0, y==0)
-            update_movelist(moves, x-3, y, piece.hasBeenClickedCount == 0, y==0)
+        if piece.colour == 'White' and piece.hasBeenClickedCount == 0:
+            update_movelist(piece.moves, x+2, y, piece.hasBeenClickedCount == 0, y==7)
+            update_movelist(piece.moves, x-3, y, piece.hasBeenClickedCount == 0, y==7)
+        elif piece.colour == 'Black' and piece.hasBeenClickedCount == 0:
+            update_movelist(piece.moves, x+2, y, piece.hasBeenClickedCount == 0, y==0)
+            update_movelist(piece.moves, x-3, y, piece.hasBeenClickedCount == 0, y==0)
 
-        moves = process_moves(piece, pieces, moves)
+        process_moves(piece, pieces, turn_colour)
 
         piece.hasBeenClickedCount += 1
 
-    return moves
+    return piece.moves
 
 def update_movelist(list, a, b, acondition=True, bcondition=True):
     if acondition and bcondition:
         list.append((a,b))
 
-def process_moves(piece, pieces, moves):
+def process_moves(piece, pieces, turn_colour):
 
     #Remove empty lists of moves and duplicates
-    moves = list(filter(lambda x: x != [], moves))
-    moves = list(dict.fromkeys(moves))
+    piece.moves = list(filter(lambda x: x != [], piece.moves))
+    piece.moves = list(dict.fromkeys(piece.moves))
 
     x, y = return_indices(piece.rect.center, coords)
     for other in pieces:
         i, j = return_indices(other.rect.center, coords)
 
-        for elem in moves[:]:
+        for elem in piece.moves[:]:
             #If another piece of same colour is there, it ain't a valid move
             if (i,j) == elem and piece.colour == other.colour:
-                moves.remove(elem)
+                piece.moves.remove(elem)
 
             #moving up/down on same file
             if x == i and elem[0] == i:
                 if elem[1] < j and j < y:
-                    moves.remove(elem)
+                    piece.moves.remove(elem)
                 elif y < j and j < elem[1]:
-                    moves.remove(elem)
+                    piece.moves.remove(elem)
 
             #moving left/right on same rank
             if y == j and elem[1] == j:
                 if x < i and elem[0] > i:
-                    moves.remove(elem) #moving right on same rank
+                    piece.moves.remove(elem) #moving right on same rank
                 elif x > i and elem[0] < i:
-                    moves.remove(elem) #moving left on same rank
+                    piece.moves.remove(elem) #moving left on same rank
 
             #moving along upper/lower-right diagonal
             if x < i and i < elem[0]:
                 if j == y - (i-x) and elem[1] == j - (elem[0]-i):
-                    moves.remove(elem)
+                    piece.moves.remove(elem)
                 elif j == y + (i-x) and elem[1] == j + (elem[0]-i):
-                    moves.remove(elem)
+                    piece.moves.remove(elem)
 
             #moving along upper/lower-left diagonal
             if elem[0] < i and i < x:
                 if j == y + (i-x) and elem[1] == j + (elem[0]-i):
-                    moves.remove(elem) #moving along upper/lower-left diagonal
+                    piece.moves.remove(elem) #moving along upper/lower-left diagonal
                 elif j == y - (i-x) and elem[1] == j - (elem[0]-i):
-                    moves.remove(elem)
+                    piece.moves.remove(elem)
 
         #Loop through remaining moves: for any piece, if opposite piece is within reach and a valid move, it's takeable
-        #Also, for pawns, make sure you can take where possible!
+        #Also, for pawns, make sure you can take where possible, and that you are takeable or not!
         if other != piece:
-            for move in moves:
+            for move in piece.moves:
                 if (i,j) == move and piece.colour != other.colour and piece.type != 'P':
                     other.takeable = True
+                #Can't step into check
+                if move in other.moves and piece.colour == turn_colour and piece.type == 'KG':
+                    piece.moves.remove(move)
+
                 elif piece.type == 'P':
                     if (i,j) == move and i == x:
                         other.takeable = False
-                    #white pieces
-                    elif piece.colour == 'white' and (i == x-1 or i == x+1) and j == y-1:
+                    #White pieces
+                    elif piece.colour == 'White' and (i == x-1 or i == x+1) and j == y-1:
                         other.takeable = True
-                    #black pieces
-                    elif piece.colour == 'black' and (i == x-1 or i == x+1) and j == y+1:
+                    #Black pieces
+                    elif piece.colour == 'Black' and (i == x-1 or i == x+1) and j == y+1:
                         other.takeable = True
-
-    return moves
+            #Check if you are takeable or not!
+            if (x,y) in other.moves:
+                piece.takeable = True
 
 def return_indices(value, coords):
     for i in range(8):
