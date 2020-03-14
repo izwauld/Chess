@@ -192,13 +192,10 @@ def make_move(piece, pieces, curr_pos, moves, screen):
     for other in pieces:
         if other != piece:
             a, b = return_indices(other.rect.center, coords)
-            print(other.hasBeenClickedCount)
-            print(piece.type == 'P' and other.type == 'P' and piece.colour != other.colour)
             #If there is a piece in candidate square, consider if it is takeable or not
             if numpy.array_equal(other.rect.center, coords[i,j]):
                 if not other.takeable or other.type == 'KG':
                     #Can't take piece, move back
-                    print("True")
                     piece.rect.center = coords[l,m]
                     piece.clicked = False
                     moveIsValid = False
@@ -213,13 +210,10 @@ def make_move(piece, pieces, curr_pos, moves, screen):
             
             #En-passant
             elif piece.type == 'P' and other.type == 'P' and piece.colour != other.colour and other.hasBeenClickedCount == 1:
-                print("en-pas time")
                 if piece.colour == 'White':
                     cond1 = i == l-1 and j == m-1
                     cond2 = i == l+1 and j == m-1
                     
-                    print(cond1 and i == a and j == b-1)
-                    print(cond2 and i == a and j == b-1)
                     if cond1 and i == a and j == b-1:
                         pieces.remove(other)
                         x, y = return_closest_indices(mouse_pos, coords)
@@ -297,9 +291,7 @@ def make_move(piece, pieces, curr_pos, moves, screen):
             else:
                 count+=1
                 king.check = False
-                print("No luck...")
 
-    print(count)
     if count == num_pieces - 1:#if none of the other pieces occupy the square, and its a valid move, go there!
         if piece.type == 'P' and (i == l+1 or i == l-1) and (j == m-1 or j == m+1):
             if piece.hasBeenClickedCount == 1:
@@ -379,7 +371,6 @@ def main():
                                 clicked_piece = piece
                                 position = numpy.array(piece.rect.center)
                                 clicked_piece.moves = generate_moves(piece, pieces, coords)
-                                print(piece.moves)
                                 break
 
             if event.type == pygame.MOUSEBUTTONUP:
@@ -396,7 +387,7 @@ def main():
                     #Update moveset if the clicked_piece is not in check
                     clicked_piece.moves = generate_moves(clicked_piece, pieces, coords)
                     clicked_piece.hasBeenClickedCount -= 1 #since we increase moves by 1 in the above step - too many!
-                    print(clicked_piece.hasBeenClickedCount)
+
                     enemy_king = list(filter(lambda x: x.type == 'KG' and x.colour != clicked_piece.colour, pieces))[0]
                     enemy_king.moves = generate_moves(enemy_king, pieces, coords)
                     enemies = list(filter(lambda x: x.colour != enemy_king.colour, pieces))
@@ -426,10 +417,6 @@ def main():
         for piece in pieces:
             if piece.clicked == True and piece.colour == turn_colour:
                 piece.move()
-
-        for piece in pieces:
-            if piece.rect.collidepoint(mouse_pos):
-                print(piece.hasBeenClickedCount)
 
         board_canvas, board = create_board(0,0,screen)
         screen.fill(Black)
