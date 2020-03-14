@@ -13,20 +13,20 @@ pygame.init()
 # and chess square area threshold, and image locations of pieces)
 screen_width=800
 screen_height=800
-BLACK = 0,0,0 
+Black = 0,0,0 
 RED = 255,0,0
 GREEN = 0,255,0
 BLUE = 0,0,255
-WHITE = 255,255,255
+White = 255,255,255
 delta = 60 #if placing piece within delta pixels of a square, place in that square
 
 types = ['P', 'B', 'K', 'R', 'Q', 'KG']
-white_pieces = {}
-black_pieces = {}
+White_pieces = {}
+Black_pieces = {}
 
 for p in types:
-    white_pieces[p] = os.getcwd() +  '/images/' + p + 'w.png'
-    black_pieces[p] = os.getcwd() + '/images/' + p + 'b.png'
+    White_pieces[p] = os.getcwd() +  '/images/' + p + 'w.png'
+    Black_pieces[p] = os.getcwd() + '/images/' + p + 'b.png'
 
 #Pre-determined ratios between square screen dimensions and the top left of the board image
 start_fract = 3 / 40
@@ -42,7 +42,7 @@ incr_y = round(center_fract * screen_height)
 start_y += round(incr_y / 2)
 
 piece_size = (round(0.9*incr_x), round(0.9*incr_y))
-delta = round(0.8*piece_size[0]) #tuneable: threhold for determining which square a piece is placed in
+delta = round(0.9*piece_size[0]) #tuneable: threhold for determining which square a piece is placed in
 
 #The dimensions of our board in the image
 board_area = pygame.Rect((0.5*start_y, 0.5*start_x), (start_y+7*incr_y, start_x+7*incr_x))
@@ -51,13 +51,13 @@ board_area = pygame.Rect((0.5*start_y, 0.5*start_x), (start_y+7*incr_y, start_x+
 coords = numpy.array([[[x,y] for y in range(start_x,start_x+8*incr_x,incr_x)] for x in range(start_y,start_y+8*incr_y,incr_y)])
 ###############################################################################################################################
 
-# Create pieces, white/black pieces (done)
+# Create pieces, White/Black pieces (done)
 class Piece(pygame.sprite.Sprite):
     """Defines a chess piece which inherits from the Sprite class.
 
     Attributes:
         type: str, the type of the piece (pawn, rooks, queen, etc.)
-        colour: str, the colour of the piece (black or white)
+        colour: str, the colour of the piece (Black or White)
         takeable: bool, describes the takeable state of the piece
         clicked: bool, describes if the piece has been taken or not
         hasBeenClickedCount: int, counts how many times the piece has been moved/clicked
@@ -84,12 +84,12 @@ class Piece(pygame.sprite.Sprite):
         if self.type == 'KG':
             self.check = False
 
-        if self.colour == 'white':
+        if self.colour == 'White':
             # Since images are transparent, convert_alpha() needs to be called
-            self.image = pygame.image.load(white_pieces[piece]).convert_alpha()
+            self.image = pygame.image.load(White_pieces[piece]).convert_alpha()
             self.image = pygame.transform.scale(self.image, piece_size)
         else:
-            self.image = pygame.image.load(black_pieces[piece]).convert_alpha()
+            self.image = pygame.image.load(Black_pieces[piece]).convert_alpha()
             self.image = pygame.transform.scale(self.image, piece_size)
 
 
@@ -113,36 +113,36 @@ def populate_board():
 
     #Pawns
     for i in range(8):
-        pieces.add(Piece('P', 'black', coords[i,1]))
-        pieces.add(Piece('P', 'white', coords[i,6]))
+        pieces.add(Piece('P', 'Black', coords[i,1]))
+        pieces.add(Piece('P', 'White', coords[i,6]))
     #Rooks
-    pieces.add(Piece('R', 'black', coords[0,0]))
-    pieces.add(Piece('R', 'black', coords[7,0]))
-    pieces.add(Piece('R', 'white', coords[0,7]))
-    pieces.add(Piece('R', 'white', coords[7,7]))
+    pieces.add(Piece('R', 'Black', coords[0,0]))
+    pieces.add(Piece('R', 'Black', coords[7,0]))
+    pieces.add(Piece('R', 'White', coords[0,7]))
+    pieces.add(Piece('R', 'White', coords[7,7]))
     #Knights
-    pieces.add(Piece('K', 'black', coords[1,0]))
-    pieces.add(Piece('K', 'black', coords[6,0]))
-    pieces.add(Piece('K', 'white', coords[1,7]))
-    pieces.add(Piece('K', 'white', coords[6,7]))
+    pieces.add(Piece('K', 'Black', coords[1,0]))
+    pieces.add(Piece('K', 'Black', coords[6,0]))
+    pieces.add(Piece('K', 'White', coords[1,7]))
+    pieces.add(Piece('K', 'White', coords[6,7]))
     #Bishops
-    pieces.add(Piece('B', 'black', coords[2,0]))
-    pieces.add(Piece('B', 'black', coords[5,0]))
-    pieces.add(Piece('B', 'white', coords[2,7]))
-    pieces.add(Piece('B', 'white', coords[5,7]))
+    pieces.add(Piece('B', 'Black', coords[2,0]))
+    pieces.add(Piece('B', 'Black', coords[5,0]))
+    pieces.add(Piece('B', 'White', coords[2,7]))
+    pieces.add(Piece('B', 'White', coords[5,7]))
     #Queens
-    pieces.add(Piece('Q', 'black', coords[3,0]))
-    pieces.add(Piece('Q', 'white', coords[3,7]))
+    pieces.add(Piece('Q', 'Black', coords[3,0]))
+    pieces.add(Piece('Q', 'White', coords[3,7]))
     #Kings
-    pieces.add(Piece('KG', 'black', coords[4,0]))
-    pieces.add(Piece('KG', 'white', coords[4,7]))
+    pieces.add(Piece('KG', 'Black', coords[4,0]))
+    pieces.add(Piece('KG', 'White', coords[4,7]))
 
     return pieces
     
-# Draw chess board, interchanging black/white squares (done)
+# Draw chess board, interchanging Black/White squares (done)
 def create_board(xstart, ystart, screen):
 
-    board_canvas = pygame.draw.rect(screen, (BLACK), ((xstart, ystart), (screen_width, screen_height)))
+    board_canvas = pygame.draw.rect(screen, (Black), ((xstart, ystart), (screen_width, screen_height)))
     board = pygame.image.load(os.getcwd() + '/images/chess_board.png').convert()
     board = pygame.transform.scale(board, (screen_width, screen_height))
 
@@ -192,10 +192,13 @@ def make_move(piece, pieces, curr_pos, moves, screen):
     for other in pieces:
         if other != piece:
             a, b = return_indices(other.rect.center, coords)
+            print(other.hasBeenClickedCount)
+            print(piece.type == 'P' and other.type == 'P' and piece.colour != other.colour)
             #If there is a piece in candidate square, consider if it is takeable or not
             if numpy.array_equal(other.rect.center, coords[i,j]):
                 if not other.takeable or other.type == 'KG':
                     #Can't take piece, move back
+                    print("True")
                     piece.rect.center = coords[l,m]
                     piece.clicked = False
                     moveIsValid = False
@@ -210,17 +213,21 @@ def make_move(piece, pieces, curr_pos, moves, screen):
             
             #En-passant
             elif piece.type == 'P' and other.type == 'P' and piece.colour != other.colour and other.hasBeenClickedCount == 1:
-                if piece.colour == 'white':
+                print("en-pas time")
+                if piece.colour == 'White':
                     cond1 = i == l-1 and j == m-1
                     cond2 = i == l+1 and j == m-1
                     
+                    print(cond1 and i == a and j == b-1)
+                    print(cond2 and i == a and j == b-1)
                     if cond1 and i == a and j == b-1:
                         pieces.remove(other)
                         x, y = return_closest_indices(mouse_pos, coords)
                         piece.rect.center = coords[x,y]
                         piece.clicked = False
                         moveIsValid = True
-                    if cond2 and i == a and j == b-1:
+
+                    elif cond2 and i == a and j == b-1:
                         pieces.remove(other)
                         x, y = return_closest_indices(mouse_pos, coords)
                         piece.rect.center = coords[x,y]
@@ -230,7 +237,7 @@ def make_move(piece, pieces, curr_pos, moves, screen):
                     else:
                         count+=1
 
-                elif piece.colour == 'black':
+                elif piece.colour == 'Black':
                     cond1 = i == l-1 and j == m+1
                     cond2 = i == l+1 and j == m+1
 
@@ -239,11 +246,13 @@ def make_move(piece, pieces, curr_pos, moves, screen):
                         piece.rect.center = coords[i,j]
                         piece.clicked = False
                         moveIsValid = True
-                    if cond2 and i == a and j == b+1:
+                        
+                    elif cond2 and i == a and j == b+1:
                         pieces.remove(other)
                         piece.rect.center = coords[i,j]
                         piece.clicked = False
                         moveIsValid = True
+                        
 
                     else:
                         count+=1
@@ -259,21 +268,27 @@ def make_move(piece, pieces, curr_pos, moves, screen):
                     count+=1 
             #P=Q
             elif piece.type == 'P':
-                if piece.colour == 'white' and m == 1 and j == 0:
+                if piece.colour == 'White' and m == 1 and j == 0:
                     dead = list(filter(lambda x: numpy.array_equal(x.rect.center, coords[i,j]), pieces))
                     for other_piece in dead:
                         pieces.remove(other_piece) 
                     pieces.remove(piece)
                     queen = Piece('Q', piece.colour, coords[i,j])
                     pieces.add(queen)
+                    piece = queen
+                    piece.clicked = False
+                    moveIsValid = False
                     return
-                elif piece.colour == 'black' and m == 6 and j == 7:
+                elif piece.colour == 'Black' and m == 6 and j == 7:
                     dead = list(filter(lambda x: numpy.array_equal(x.rect.center, coords[i,j]), pieces))
                     for other_piece in dead:
                         pieces.remove(other_piece) 
                     pieces.remove(piece)
                     queen = Piece('Q', piece.colour, coords[i,j])
                     pieces.add(queen)
+                    piece = queen
+                    piece.clicked = False
+                    moveIsValid = True
                     return
 
                 else:
@@ -282,7 +297,9 @@ def make_move(piece, pieces, curr_pos, moves, screen):
             else:
                 count+=1
                 king.check = False
+                print("No luck...")
 
+    print(count)
     if count == num_pieces - 1:#if none of the other pieces occupy the square, and its a valid move, go there!
         if piece.type == 'P' and (i == l+1 or i == l-1) and (j == m-1 or j == m+1):
             if piece.hasBeenClickedCount == 1:
@@ -329,11 +346,12 @@ def main():
     check_piece = None
 
     while True:
-        #White starts, then black
+        mouse_pos = pygame.mouse.get_pos()
+        #White starts, then Black
         if turn % 2 == 0:
-            turn_colour = 'white'
+            turn_colour = 'White'
         else:
-            turn_colour = 'black'
+            turn_colour = 'Black'
 
         for event in pygame.event.get():
 
@@ -360,28 +378,30 @@ def main():
                                 piece.clicked = True
                                 clicked_piece = piece
                                 position = numpy.array(piece.rect.center)
-                                if piece.hasBeenClickedCount == 0:
-                                    clicked_piece.moves = generate_moves(clicked_piece, pieces, coords)
+                                clicked_piece.moves = generate_moves(piece, pieces, coords)
+                                print(piece.moves)
+                                break
 
             if event.type == pygame.MOUSEBUTTONUP:
                 if clicked_piece != None:
                     make_move(clicked_piece, pieces, position, clicked_piece.moves, screen) #should have update isMoveValid and piece.clicked
                     if moveIsValid:
                         turn += 1
+                    else:
+                        if clicked_piece.hasBeenClickedCount > 1:
+                            clicked_piece.hasBeenClickedCount -= 1
 
                     if clicked_piece == king and king.check:
                         continue
-                    else:
-                        #Update moveset if the clicked_piece is not in check
-                        clicked_piece.moves = generate_moves(clicked_piece, pieces, coords)
-
+                    #Update moveset if the clicked_piece is not in check
+                    clicked_piece.moves = generate_moves(clicked_piece, pieces, coords)
+                    clicked_piece.hasBeenClickedCount -= 1 #since we increase moves by 1 in the above step - too many!
+                    print(clicked_piece.hasBeenClickedCount)
                     enemy_king = list(filter(lambda x: x.type == 'KG' and x.colour != clicked_piece.colour, pieces))[0]
                     enemy_king.moves = generate_moves(enemy_king, pieces, coords)
                     enemies = list(filter(lambda x: x.colour != enemy_king.colour, pieces))
                     enemies_moves = [enemy.moves for enemy in enemies]
 
-                    print("King moves: " + str(enemy_king.moves))
-                    
                     while len(enemies_moves) != 0:
                         moves = enemies_moves.pop()
                         invalid_moves = [move for move in enemy_king.moves if move in moves]
@@ -407,11 +427,16 @@ def main():
             if piece.clicked == True and piece.colour == turn_colour:
                 piece.move()
 
+        for piece in pieces:
+            if piece.rect.collidepoint(mouse_pos):
+                print(piece.hasBeenClickedCount)
+
         board_canvas, board = create_board(0,0,screen)
-        screen.fill(BLACK)
+        screen.fill(Black)
         screen.blit(board, board_canvas)
         pieces.draw(screen)
         pygame.display.flip()
+
 
 if __name__ == '__main__':
     main()
