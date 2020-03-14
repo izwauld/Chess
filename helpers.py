@@ -139,6 +139,14 @@ def generate_moves(piece, pieces, coords, turn_colour):
 
     #Kings
     elif piece.type == 'KG':
+        #Castling
+        if piece.colour == 'White' and piece.hasBeenClickedCount == 0:
+            update_movelist(piece.moves, x+2, y, piece.hasBeenClickedCount == 0, y==7)
+            update_movelist(piece.moves, x-3, y, piece.hasBeenClickedCount == 0, y==7)
+        elif piece.colour == 'Black' and piece.hasBeenClickedCount == 0:
+            update_movelist(piece.moves, x+2, y, piece.hasBeenClickedCount == 0, y==0)
+            update_movelist(piece.moves, x-3, y, piece.hasBeenClickedCount == 0, y==0)
+
         update_movelist(piece.moves, x+1, y+1, x+1<8, y+1<8)
         update_movelist(piece.moves, x, y+1, True, y+1<8)
         update_movelist(piece.moves, x-1, y+1, x-1>=0, y+1<8)
@@ -147,14 +155,6 @@ def generate_moves(piece, pieces, coords, turn_colour):
         update_movelist(piece.moves, x+1, y-1, x+1<8, y-1>=0)
         update_movelist(piece.moves, x, y-1, True, y-1>=0)
         update_movelist(piece.moves, x-1, y-1, x-1>=0, y-1>=0)
-
-        #Castling
-        if piece.colour == 'White' and piece.hasBeenClickedCount == 0:
-            update_movelist(piece.moves, x+2, y, piece.hasBeenClickedCount == 0, y==7)
-            update_movelist(piece.moves, x-3, y, piece.hasBeenClickedCount == 0, y==7)
-        elif piece.colour == 'Black' and piece.hasBeenClickedCount == 0:
-            update_movelist(piece.moves, x+2, y, piece.hasBeenClickedCount == 0, y==0)
-            update_movelist(piece.moves, x-3, y, piece.hasBeenClickedCount == 0, y==0)
 
         process_moves(piece, pieces, turn_colour)
 
@@ -216,7 +216,7 @@ def process_moves(piece, pieces, turn_colour):
                 if (i,j) == move and piece.colour != other.colour and piece.type != 'P':
                     other.takeable = True
                 #Can't step into check
-                if move in other.moves and piece.colour == turn_colour and piece.type == 'KG':
+                if move in other.moves and other.colour != piece.colour and piece.colour == turn_colour and piece.type == 'KG':
                     piece.moves.remove(move)
 
                 elif piece.type == 'P':
@@ -229,8 +229,8 @@ def process_moves(piece, pieces, turn_colour):
                     elif piece.colour == 'Black' and (i == x-1 or i == x+1) and j == y+1:
                         other.takeable = True
             #Check if you are takeable or not!
-            if (x,y) in other.moves:
-                piece.takeable = True
+            #if (x,y) in other.moves and other.colour != piece.colour:
+            #    piece.takeable = True
 
 def return_indices(value, coords):
     for i in range(8):

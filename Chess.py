@@ -18,7 +18,6 @@ RED = 255,0,0
 GREEN = 0,255,0
 BLUE = 0,0,255
 White = 255,255,255
-delta = 60 #if placing piece within delta pixels of a square, place in that square
 
 types = ['P', 'B', 'K', 'R', 'Q', 'KG']
 White_pieces = {}
@@ -296,8 +295,10 @@ def make_move(piece, pieces, curr_pos, moves, screen):
 
     if count == num_pieces - 1:#if none of the other pieces occupy the square, and its a valid move, go there!
         if piece.type == 'P' and (i == l+1 or i == l-1) and (j == m-1 or j == m+1):
-            if piece.hasBeenClickedCount == 1:
-                piece.hasBeenClickedCount = 0
+            if piece.hasBeenClickedCount > 1:
+                piece.hasBeenClickedCount -= 1
+            elif piece.hasBeenClickedCount == 1:
+                piece.hasBeenClickedCount = 0 
             piece.rect.center = coords[l,m]
             piece.clicked = False
             moveIsValid = False
@@ -322,8 +323,8 @@ def make_move(piece, pieces, curr_pos, moves, screen):
         
 
         #If King has made a valid move, he's not in check
-        if piece.type == 'KG':
-            piece.check = False
+        #if piece.type == 'KG':
+        #    piece.check = False
 
 #Find intersecting moves of two pieces
 def common_moves(piece1, piece2):
@@ -359,8 +360,7 @@ def main():
                 clicked = [piece for piece in pieces if piece.clicked]
 
                 king = list(filter(lambda x: x.type == 'KG' and x.colour == turn_colour, pieces))[0]
-                king.moves = generate_moves(king, pieces, coords, turn_colour)
-                print(king.moves)
+
                 if king.check:
                     if event.button == 1 and king.rect.collidepoint(mouse_pos):
                        king.clicked = True
@@ -374,7 +374,6 @@ def main():
                                 clicked_piece = piece
                                 position = numpy.array(piece.rect.center)
                                 clicked_piece.moves = generate_moves(piece, pieces, coords, turn_colour)
-                                break
 
             if event.type == pygame.MOUSEBUTTONUP:
                 if clicked_piece != None:
@@ -382,7 +381,7 @@ def main():
                     if moveIsValid:
                         turn += 1
                     else:
-                        if clicked_piece.hasBeenClickedCount > 1:
+                        if clicked_piece.hasBeenClickedCount >= 1:
                             clicked_piece.hasBeenClickedCount -= 1
 
                     if clicked_piece == king and king.check:
@@ -392,7 +391,6 @@ def main():
                     clicked_piece.hasBeenClickedCount -= 1 #since we increase moves by 1 in the above step - too many!
 
                     enemy_king = list(filter(lambda x: x.type == 'KG' and x.colour != clicked_piece.colour, pieces))[0]
-                    enemy_king.moves = generate_moves(enemy_king, pieces, coords, turn_colour)
                     enemies = list(filter(lambda x: x.colour != enemy_king.colour, pieces))
                     enemies_moves = [enemy.moves for enemy in enemies]
 
@@ -413,6 +411,7 @@ def main():
 
                         for move in invalid_moves:
                             enemy_king.moves.remove(move)
+
      
         for piece in pieces:
             if piece.clicked == True and piece.colour == turn_colour:
