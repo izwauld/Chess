@@ -1,4 +1,4 @@
-# ChessProgram
+# Chess
 
 A simple Chess program built with Pygame. 
 
