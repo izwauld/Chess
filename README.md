@@ -13,5 +13,4 @@ The game in action:
 
 ![](images/Chess.gif)
 
-**Note: Development is still in progress, however most of the game is built and functional.** 
 
